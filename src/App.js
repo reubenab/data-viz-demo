@@ -6,14 +6,10 @@ function App() {
     <>
       <Container>
         <header className="App-header">
-          <h1>
-            Comparing pay data
-          </h1>
+          <h1>Comparing pay data</h1>
         </header>
         <body className="App-body">
-          <p>
-            TODO: add the charts representing pay data here
-          </p>
+          <p>TODO: add the charts representing pay data here</p>
         </body>
       </Container>
     </>
