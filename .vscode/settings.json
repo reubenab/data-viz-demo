@@ -1,3 +1,27 @@
 {
-  "editor.formatOnSave": true
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "build": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "Pods": true,
+    ".vscode/.react/*": true
+  },
+  "[javascript]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 }
