@@ -1,4 +1,7 @@
+import { useMemo, useState } from 'react';
 import Container from 'react-bootstrap/Container';
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import Row from 'react-bootstrap/Row';
 import Table from 'react-bootstrap/Table';
 import _ from 'lodash';
@@ -42,20 +45,35 @@ const getAverageSalary = rawData => {
   return _.round(totalSalary / numEmployees);
 }
 
+const COMPARE_KEYS = {
+  GENDER: 'gender',
+  DEPARTMENT: 'department',
+  PERFORMANCE: 'performance',
+};
+
 const Body = () => {
-  const rawEmployeeData = getEmployeesRaw();
-  const maleEmployeeData = _.filter(rawEmployeeData, ({ gender }) => gender === 'M');
-  const femaleEmployeeData = _.filter(rawEmployeeData, ({ gender }) => gender === 'F');
-  const averageMaleSalary = getAverageSalary(maleEmployeeData);
-  const averageFemaleSalary = getAverageSalary(femaleEmployeeData);
+  const [compareValue, setCompareValue] = useState(COMPARE_KEYS.GENDER);
+  const rawEmployeeData = useMemo(() => getEmployeesRaw(), []);
+  const maleEmployeeData = useMemo(() => _.filter(rawEmployeeData, ({ gender }) => gender === 'M'), [rawEmployeeData]);
+  const femaleEmployeeData = useMemo(() => _.filter(rawEmployeeData, ({ gender }) => gender === 'F'), [rawEmployeeData]);
+  const averageMaleSalary = useMemo(() => getAverageSalary(maleEmployeeData), [maleEmployeeData]);
+  const averageFemaleSalary = useMemo(() => getAverageSalary(femaleEmployeeData), [femaleEmployeeData]);
   const data = [
     { gender: 'male', averageSalary: averageMaleSalary },
     { gender: 'female', averageSalary: averageFemaleSalary },
   ]
+  const handleCompareButtonSelect = (eventKey) => {
+    setCompareValue(eventKey);
+  }
   return (
     <Container>
-      <Row>
-        <p>Gender differences</p>
+      <Row className="align-items-center margin-top-5">
+        <p style={{ marginRight: 20 }}>Compare across</p>
+        <DropdownButton id="compare-across" title={_.upperFirst(compareValue)} onSelect={handleCompareButtonSelect}>
+          <Dropdown.Item eventKey={COMPARE_KEYS.GENDER}>Gender</Dropdown.Item>
+          <Dropdown.Item eventKey={COMPARE_KEYS.DEPARTMENT}>Department</Dropdown.Item>
+          <Dropdown.Item eventKey={COMPARE_KEYS.PERFORMANCE}>Performance</Dropdown.Item>
+        </DropdownButton>
       </Row>
       <Row>
         <DataVizCharts data={data} />
