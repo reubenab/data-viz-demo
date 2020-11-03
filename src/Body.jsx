@@ -77,7 +77,7 @@ const Body = () => {
         </DropdownButton>
       </Row>
       <Row>
-        <DataVizCharts data={data} />
+        <DataVizCharts data={data} label={_.upperFirst(compareValue)} />
       </Row>
       <Row>
         <Table striped bordered>

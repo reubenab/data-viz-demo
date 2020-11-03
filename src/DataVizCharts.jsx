@@ -10,7 +10,7 @@ import {
   VictoryTheme,
 } from 'victory';
 
-const DataVizCharts = ({ data }) => {
+const DataVizCharts = ({ data, label }) => {
   return (
     <Container>
       <Row>
@@ -21,7 +21,12 @@ const DataVizCharts = ({ data }) => {
             domainPadding={50}
             theme={VictoryTheme.material}
           >
-            <VictoryAxis tickFormat={_.upperFirst} />
+            <VictoryAxis label={label} tickFormat={_.upperFirst} style={{
+              axisLabel: {
+                fontSize: 20,
+                padding: 40,
+              }
+            }} />
             <VictoryAxis
               dependentAxis
               tickFormat={(y) => `$${y / 1000}k`}
