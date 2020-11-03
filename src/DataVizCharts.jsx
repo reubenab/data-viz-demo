@@ -16,8 +16,8 @@ const DataVizCharts = ({ data }) => {
       <Row>
         <Col>
           <VictoryChart
-            height={200}
-            width={300}
+            height={300}
+            width={500}
             domainPadding={50}
             theme={VictoryTheme.material}
           >
@@ -28,7 +28,7 @@ const DataVizCharts = ({ data }) => {
             />
             <VictoryBar
               data={data}
-              x="gender"
+              x="groupName"
               y="averageSalary"
               barWidth={20}
             />
@@ -36,9 +36,9 @@ const DataVizCharts = ({ data }) => {
         </Col>
         <Col>
           <VictoryPie
-            radius={100}
+            radius={80}
             data={data}
-            x="gender"
+            x="groupName"
             y="averageSalary"
             colorScale={'cool'}
           />

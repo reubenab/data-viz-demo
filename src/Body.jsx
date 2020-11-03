@@ -54,14 +54,15 @@ const COMPARE_KEYS = {
 const Body = () => {
   const [compareValue, setCompareValue] = useState(COMPARE_KEYS.GENDER);
   const rawEmployeeData = useMemo(() => getEmployeesRaw(), []);
+  const groupedData = useMemo(() => _.groupBy(rawEmployeeData, compareValue), [rawEmployeeData, compareValue]);
   const maleEmployeeData = useMemo(() => _.filter(rawEmployeeData, ({ gender }) => gender === 'M'), [rawEmployeeData]);
   const femaleEmployeeData = useMemo(() => _.filter(rawEmployeeData, ({ gender }) => gender === 'F'), [rawEmployeeData]);
   const averageMaleSalary = useMemo(() => getAverageSalary(maleEmployeeData), [maleEmployeeData]);
   const averageFemaleSalary = useMemo(() => getAverageSalary(femaleEmployeeData), [femaleEmployeeData]);
-  const data = [
-    { gender: 'male', averageSalary: averageMaleSalary },
-    { gender: 'female', averageSalary: averageFemaleSalary },
-  ]
+  const data = _.map(groupedData, (groupEmployeeData, groupName) => ({
+    groupName,
+    averageSalary: getAverageSalary(groupEmployeeData),
+  }));
   const handleCompareButtonSelect = (eventKey) => {
     setCompareValue(eventKey);
   }
