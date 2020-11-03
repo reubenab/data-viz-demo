@@ -175,6 +175,7 @@ const Body = () => {
 
   // data to power smart alerts
 
+  // TODO: do comparisons against mean salaries as well for alerts
   // const totalSalaryAcrossFilteredGroups = _.reduce(
   //   data,
   //   (acc, { averageSalary, numEmployees }) => acc + (averageSalary * numEmployees),
