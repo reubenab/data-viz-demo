@@ -8,6 +8,7 @@ import {
   VictoryChart,
   VictoryPie,
   VictoryTheme,
+  VictoryTooltip
 } from 'victory';
 
 const DataVizCharts = ({ data, label }) => {
@@ -37,6 +38,8 @@ const DataVizCharts = ({ data, label }) => {
               y="averageSalary"
               barWidth={20}
               style={{ data: { fill: 'rgb(39 70 185)'}}}
+              labels={({ datum }) => `$${datum.averageSalary}`}
+              labelComponent={<VictoryTooltip dy={0} />} 
             />
           </VictoryChart>
         </Col>
