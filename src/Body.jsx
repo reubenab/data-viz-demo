@@ -89,14 +89,16 @@ const Body = () => {
               <th>Salary</th>
             </tr>
           </thead>
-          {_.map(data, ({ groupName, averageSalary }) => (
-            <tr>
-              <td>{compareValue === COMPARE_KEYS.GENDER ? groupName : 'All'}</td>
-              <td>{compareValue === COMPARE_KEYS.DEPARTMENT ? groupName : 'All'}</td>
-              <td>{compareValue === COMPARE_KEYS.PERFORMANCE ? groupName : 'All'}</td>
-              <td>{`$${averageSalary}`}</td>
-            </tr>
-          ))}
+          <tbody>
+            {_.map(data, ({ groupName, averageSalary }) => (
+              <tr>
+                <td>{compareValue === COMPARE_KEYS.GENDER ? groupName : 'All'}</td>
+                <td>{compareValue === COMPARE_KEYS.DEPARTMENT ? groupName : 'All'}</td>
+                <td>{compareValue === COMPARE_KEYS.PERFORMANCE ? groupName : 'All'}</td>
+                <td>{`$${averageSalary}`}</td>
+              </tr>
+            ))}
+          </tbody>
         </Table>
       </Row>
     </Container>
