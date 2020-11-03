@@ -36,6 +36,7 @@ const DataVizCharts = ({ data, label }) => {
               x="groupName"
               y="averageSalary"
               barWidth={20}
+              style={{ data: { fill: 'rgb(39 70 185)'}}}
             />
           </VictoryChart>
         </Col>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Container from 'react-bootstrap/Container';
@@ -97,10 +98,11 @@ const initialFilter = {
 
 const Body = () => {
   const [compareValue, setCompareValue] = useState(COMPARE_KEYS.GENDER);
+  const [shouldShowAdditionalFilters, setShouldShowAdditionalFilters] = useState(false);
   const [additionalFilters, setAdditionalFilters] = useState(initialFilter);
   const rawEmployeeData = useMemo(() => getEmployeesRaw(), []);
   const groupedData = useMemo(() => _.groupBy(rawEmployeeData, compareValue), [rawEmployeeData, compareValue]);
-  const unsortedData = _.map(groupedData, (groupEmployeeData, groupName) => {
+  const unsortedData = useMemo(() => _.map(groupedData, (groupEmployeeData, groupName) => {
     const filteredEmployeeData = _.filter(groupEmployeeData, (employee) => {
       return _.every(additionalFilters, (filterValue, filterType) => {
         if (filterValue === 'All') {
@@ -114,57 +116,67 @@ const Body = () => {
       averageSalary: getAverageSalary(filteredEmployeeData),
       numEmployees: _.size(filteredEmployeeData),
     };
-  });
-  const data = _.sortBy(unsortedData, 'groupName');
+  }), [groupedData, additionalFilters]);
+  const data = useMemo(() => _.sortBy(unsortedData, 'groupName'), [unsortedData]);
   const handleCompareButtonSelect = (eventKey) => {
     setCompareValue(eventKey);
     setAdditionalFilters(initialFilter);
   }
+  const handleClickAdditionalFiltersLink = (e) => {
+    e.preventDefault();
+    setShouldShowAdditionalFilters(!shouldShowAdditionalFilters);
+  };
   return (
     <Container>
-      <Row className="align-items-center margin-top-5">
+      <Row className="align-items-center">
         <p style={{ marginRight: 20 }}>Compare across</p>
         <DropdownButton id="compare-across" title={_.upperFirst(compareValue)} onSelect={handleCompareButtonSelect}>
           {_.map(COMPARE_KEYS, (val) => (
             <Dropdown.Item eventKey={val}>{val}</Dropdown.Item>
           ))}
         </DropdownButton>
+        <Button style={{ marginLeft: 30 }} onClick={handleClickAdditionalFiltersLink}>{shouldShowAdditionalFilters ? 'Hide additional filters' : 'Show additional filters'}</Button>
       </Row>
-      <br />
-      <Row>Additional filters</Row>
-      {_.map(ADDITIONAL_FILTERS, (subgroups, groupName) => {
-        if (groupName === compareValue) {
-          return null;
-        }
-        return (
-          <Row className="filter-label">
-            {groupName}:
-            <ButtonGroup toggle>
-              {_.map(subgroups, (subgroupName, subgroupKey) => {
-                const handleChangeFilterRadio = (e) => {
-                  setAdditionalFilters({
-                    ...additionalFilters,
-                    [groupName]: e.currentTarget.value,
-                  });
-                };
-                return (
-                  <ToggleButton
-                    key={`${groupName}-${subgroupName}`}
-                    type="radio"
-                    variant="secondary"
-                    name="radio"
-                    value={subgroupName}
-                    checked={additionalFilters[groupName] === ADDITIONAL_FILTERS[groupName][subgroupKey]}
-                    onChange={handleChangeFilterRadio}
-                  >
-                    {subgroupName}
-                  </ToggleButton>
-                );
-              })}
-            </ButtonGroup>
-          </Row>
-        );
-      })}
+      {shouldShowAdditionalFilters && (
+        <>
+          <br />
+          <Row>Additional filters</Row>
+          {_.map(ADDITIONAL_FILTERS, (subgroups, groupName) => {
+            if (groupName === compareValue) {
+              return null;
+            }
+            return (
+              <Row className="filter-label">
+                {groupName}:
+                <ButtonGroup toggle>
+                  {_.map(subgroups, (subgroupName, subgroupKey) => {
+                    const handleChangeFilterRadio = (e) => {
+                      setAdditionalFilters({
+                        ...additionalFilters,
+                        [groupName]: e.currentTarget.value,
+                      });
+                    };
+                    return (
+                      <ToggleButton
+                        key={`${groupName}-${subgroupName}`}
+                        type="radio"
+                        variant="secondary"
+                        name="radio"
+                        value={subgroupName}
+                        checked={additionalFilters[groupName] === ADDITIONAL_FILTERS[groupName][subgroupKey]}
+                        onChange={handleChangeFilterRadio}
+                      >
+                        {subgroupName}
+                      </ToggleButton>
+                    );
+                  })}
+                </ButtonGroup>
+              </Row>
+            );
+          })}
+        </>
+      )
+    }
       <Row>
         <DataVizCharts data={data} label={_.upperFirst(compareValue)} />
       </Row>
