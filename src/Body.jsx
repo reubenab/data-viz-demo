@@ -1,5 +1,6 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
+import Table from 'react-bootstrap/Table';
 import _ from 'lodash';
 import DataVizCharts from './DataVizCharts';
 
@@ -38,17 +39,18 @@ const getAverageSalary = rawData => {
   const numEmployees = _.size(rawData);
   const allSalaries = _.flatten(_.map(rawData, ({ eid }) => salaryForEmployeeThisYear(eid)));
   const totalSalary = _.sumBy(allSalaries, ({ salary}) => parseInt(salary));
-  return totalSalary / numEmployees;
+  return _.round(totalSalary / numEmployees);
 }
 
 const Body = () => {
   const rawEmployeeData = getEmployeesRaw();
   const maleEmployeeData = _.filter(rawEmployeeData, ({ gender }) => gender === 'M');
-  // console.log('maleEmployeeData', maleEmployeeData);
   const femaleEmployeeData = _.filter(rawEmployeeData, ({ gender }) => gender === 'F');
+  const averageMaleSalary = getAverageSalary(maleEmployeeData);
+  const averageFemaleSalary = getAverageSalary(femaleEmployeeData);
   const data = [
-    { gender: 'male', averageSalary: getAverageSalary(maleEmployeeData) },
-    { gender: 'female', averageSalary: getAverageSalary(femaleEmployeeData) },
+    { gender: 'male', averageSalary: averageMaleSalary },
+    { gender: 'female', averageSalary: averageFemaleSalary },
   ]
   return (
     <Container>
@@ -57,6 +59,30 @@ const Body = () => {
       </Row>
       <Row>
         <DataVizCharts data={data} />
+      </Row>
+      <Row>
+        <Table striped bordered>
+          <thead>
+            <tr>
+              <th>Gender</th>
+              <th>Department</th>
+              <th>Performance</th>
+              <th>Salary</th>
+            </tr>
+            <tr>
+              <td>Male</td>
+              <td>All</td>
+              <td>All</td>
+              <td>{`$${averageMaleSalary}`}</td>
+            </tr>
+            <tr>
+              <td>Female</td>
+              <td>All</td>
+              <td>All</td>
+              <td>{`$${averageFemaleSalary}`}</td>
+            </tr>
+          </thead>
+        </Table>
       </Row>
     </Container>
   );
