@@ -40,7 +40,7 @@ function App() {
                     theme={VictoryTheme.material}
                     // containerComponent={<VictoryContainer responsive={false} />}
                   >
-                    <VictoryAxis tickFormat={(x) => _.upperFirst(x)} />
+                    <VictoryAxis tickFormat={_.upperFirst} />
                     <VictoryAxis
                       dependentAxis
                       tickFormat={(y) => `$${y / 1000}k`}
@@ -59,6 +59,8 @@ function App() {
                     data={exampleData}
                     x="gender"
                     y="averageSalary"
+                    colorScale={'cool'}
+                    // labels={({ x }) => _.upperFirst(x)}
                     // containerComponent={<VictoryContainer responsive={false} />}
                   />
                 </Col>
