@@ -36,13 +36,14 @@ const getSalaryRaw = () => {
 
 const salaryForEmployeeThisYear = (eid) => {
   const salaryData = getSalaryRaw();
-  // only consider salary data from 2020
-  // TODO: handle multiple salary numbers for 2020
-  return salaryData.filter(item => item.eid === eid && item.date.substring(6) === '2020');
+  // only consider salary data from 2020 and take the latest datapoint
+  const allSalaryThisYear = salaryData.filter(item => item.eid === eid && item.date.substring(6) === '2020');
+  const chronologicalSalary = _.sortBy(allSalaryThisYear, 'date');
+  return _.last(chronologicalSalary);
 }
 
 const getAverageSalary = (employeeData) => {
-  const allSalaries = _.flatten(_.map(employeeData, ({ eid }) => salaryForEmployeeThisYear(eid)));
+  const allSalaries = _.map(employeeData, ({ eid }) => salaryForEmployeeThisYear(eid));
   const totalSalary = _.sumBy(allSalaries, ({ salary}) => parseInt(salary));
   return _.round(totalSalary / (_.size(employeeData) || 1));
 }
