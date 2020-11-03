@@ -186,8 +186,9 @@ const Body = () => {
 
   const secondHighestSalary = getSecondHighestSalaryFromGroups(data);
   const secondLowestSalary = getSecondLowestSalaryFromGroups(data);
-  const overpaidGroupVsNextBest = _.find(data, ({ averageSalary }) => averageSalary !== 0 && averageSalary > (secondHighestSalary * (1 + ACCEPTABLE_DIFFERENCE)));
-  const underpaidGroupVsNextBest = _.find(data, ({ averageSalary }) => averageSalary !== 0 && averageSalary < (secondLowestSalary * (1 - ACCEPTABLE_DIFFERENCE)));
+  const overpaidGroupVsNextBest = _.find(data, ({ averageSalary }) => !!averageSalary && !!secondHighestSalary  && averageSalary > (secondHighestSalary * (1 + ACCEPTABLE_DIFFERENCE)));
+  const underpaidGroupVsNextBest = _.find(data, ({ averageSalary }) => !!averageSalary &&  !!secondLowestSalary && averageSalary < (secondLowestSalary * (1 - ACCEPTABLE_DIFFERENCE)));
+  console.log('overpaidGroupVsNextBest', overpaidGroupVsNextBest);
   
 
   const handleCompareButtonSelect = (eventKey) => {
