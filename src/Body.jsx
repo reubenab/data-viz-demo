@@ -49,16 +49,29 @@ const COMPARE_KEYS = {
   GENDER: 'gender',
   DEPARTMENT: 'department',
   PERFORMANCE: 'performance',
+  JOB_CODE: 'job_code',
 };
+
+const ADDITIONAL_FILTERS = {
+  [COMPARE_KEYS.GENDER]: {
+    M: 'M',
+    F: 'F',
+  },
+  [COMPARE_KEYS.DEPARTMENT]: {
+    SG_AND_A: 'SG&A',
+    ENGINEERING: 'Engineering',
+  },
+}
 
 const Body = () => {
   const [compareValue, setCompareValue] = useState(COMPARE_KEYS.GENDER);
   const rawEmployeeData = useMemo(() => getEmployeesRaw(), []);
   const groupedData = useMemo(() => _.groupBy(rawEmployeeData, compareValue), [rawEmployeeData, compareValue]);
-  const data = _.map(groupedData, (groupEmployeeData, groupName) => ({
+  const unsortedData = _.map(groupedData, (groupEmployeeData, groupName) => ({
     groupName,
     averageSalary: getAverageSalary(groupEmployeeData),
   }));
+  const data = _.sortBy(unsortedData, 'groupName');
   const handleCompareButtonSelect = (eventKey) => {
     setCompareValue(eventKey);
   }
@@ -67,9 +80,9 @@ const Body = () => {
       <Row className="align-items-center margin-top-5">
         <p style={{ marginRight: 20 }}>Compare across</p>
         <DropdownButton id="compare-across" title={_.upperFirst(compareValue)} onSelect={handleCompareButtonSelect}>
-          <Dropdown.Item eventKey={COMPARE_KEYS.GENDER}>Gender</Dropdown.Item>
-          <Dropdown.Item eventKey={COMPARE_KEYS.DEPARTMENT}>Department</Dropdown.Item>
-          <Dropdown.Item eventKey={COMPARE_KEYS.PERFORMANCE}>Performance</Dropdown.Item>
+          {_.map(COMPARE_KEYS, (val) => (
+            <Dropdown.Item eventKey={val}>{val}</Dropdown.Item>
+          ))}
         </DropdownButton>
       </Row>
       <Row>
@@ -79,18 +92,18 @@ const Body = () => {
         <Table striped bordered>
           <thead>
             <tr>
-              <th>Gender</th>
-              <th>Department</th>
-              <th>Performance</th>
+              {_.map(COMPARE_KEYS, (val) => (
+                <th>{val}</th>
+              ))}
               <th>Salary</th>
             </tr>
           </thead>
           <tbody>
             {_.map(data, ({ groupName, averageSalary }) => (
               <tr>
-                <td>{compareValue === COMPARE_KEYS.GENDER ? groupName : 'All'}</td>
-                <td>{compareValue === COMPARE_KEYS.DEPARTMENT ? groupName : 'All'}</td>
-                <td>{compareValue === COMPARE_KEYS.PERFORMANCE ? groupName : 'All'}</td>
+                {_.map(COMPARE_KEYS, (val) => (
+                  <td>{compareValue === val ? groupName : 'All'}</td>
+                ))}
                 <td>{`$${averageSalary}`}</td>
               </tr>
             ))}
