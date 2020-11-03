@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import Alert from 'react-bootstrap/Alert';
 import Button from 'react-bootstrap/Button';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
@@ -97,12 +98,57 @@ const initialFilter = {
   [COMPARE_KEYS.JOB_CODE]: ADDITIONAL_FILTERS[COMPARE_KEYS.JOB_CODE].ALL,
 };
 
+const rawEmployeeData = getEmployeesRaw();
+
+const groupedDataByType = _.reduce(COMPARE_KEYS, (acc, compareKey) => ({
+  ...acc,
+  [compareKey]: _.groupBy(rawEmployeeData, compareKey),
+}), {});
+
+const ACCEPTABLE_DIFFERENCE = 0.2;
+
+// TODO: test
+const getSecondHighestSalaryFromGroups = groups => {
+  let highestSalary = 0;
+  let secondHighestSalary = 0;
+  _.forEach(groups, ({ averageSalary }) => {
+    if (highestSalary < averageSalary) {
+      highestSalary = averageSalary;
+    }
+  })
+  _.forEach(groups, ({ averageSalary }) => {
+    if (secondHighestSalary < averageSalary && averageSalary < highestSalary) {
+      secondHighestSalary = averageSalary;
+    }
+  })
+  return secondHighestSalary;
+}
+
+// TODO: test
+const getSecondLowestSalaryFromGroups = groups => {
+  let lowestSalary = Number.MAX_VALUE;
+  let secondLowestSalary = Number.MAX_VALUE;
+  _.forEach(groups, ({ averageSalary }) => {
+    if (lowestSalary > averageSalary) {
+      lowestSalary = averageSalary;
+    }
+  })
+  _.forEach(groups, ({ averageSalary }) => {
+    if (secondLowestSalary > averageSalary && averageSalary > lowestSalary) {
+      secondLowestSalary = averageSalary;
+    }
+  })
+  return secondLowestSalary;
+}
+
 const Body = () => {
   const [compareValue, setCompareValue] = useState(COMPARE_KEYS.GENDER);
   const [shouldShowAdditionalFilters, setShouldShowAdditionalFilters] = useState(false);
   const [additionalFilters, setAdditionalFilters] = useState(initialFilter);
-  const rawEmployeeData = useMemo(() => getEmployeesRaw(), []);
-  const groupedData = useMemo(() => _.groupBy(rawEmployeeData, compareValue), [rawEmployeeData, compareValue]);
+  const [hasDismissedOverpaidAlert, setHasDismissedOverpaidAlert] = useState(false);
+  const [hasDismissedUnderpaidAlert, setHasDismissedUnderpaidAlert] = useState(false);
+  // data to power charts
+  const groupedData = groupedDataByType[compareValue];
   const unsortedData = useMemo(() => _.map(groupedData, (groupEmployeeData, groupName) => {
     const filteredEmployeeData = _.filter(groupEmployeeData, (employee) => {
       return _.every(additionalFilters, (filterValue, filterType) => {
@@ -119,6 +165,23 @@ const Body = () => {
     };
   }), [groupedData, additionalFilters]);
   const data = useMemo(() => _.sortBy(unsortedData, 'groupName'), [unsortedData]);
+
+  // data to power smart alerts
+
+  // const totalSalaryAcrossFilteredGroups = _.reduce(
+  //   data,
+  //   (acc, { averageSalary, numEmployees }) => acc + (averageSalary * numEmployees),
+  //   0
+  // );
+  // const totalNumOfFilteredEmployees = _.sumBy(data, 'numEmployees');
+  // const avgSalaryAcrossFilteredGroups = totalSalaryAcrossFilteredGroups / (totalNumOfFilteredEmployees || 1);
+
+  const secondHighestSalary = getSecondHighestSalaryFromGroups(data);
+  const secondLowestSalary = getSecondLowestSalaryFromGroups(data);
+  const overpaidGroupVsNextBest = _.find(data, ({ averageSalary }) => averageSalary !== 0 && averageSalary > (secondHighestSalary * (1 + ACCEPTABLE_DIFFERENCE)));
+  const underpaidGroupVsNextBest = _.find(data, ({ averageSalary }) => averageSalary !== 0 && averageSalary < (secondLowestSalary * (1 - ACCEPTABLE_DIFFERENCE)));
+  
+
   const handleCompareButtonSelect = (eventKey) => {
     setCompareValue(eventKey);
     setAdditionalFilters(initialFilter);
@@ -140,6 +203,16 @@ const Body = () => {
           {shouldShowAdditionalFilters ? 'Hide additional filters' : 'Show additional filters'}
         </Button>
       </Row>
+      {!_.isEmpty(overpaidGroupVsNextBest) && !hasDismissedOverpaidAlert && (
+        <Alert variant="danger" dismissible onClose={() => setHasDismissedOverpaidAlert(true)}>
+          {`Under the selected filters, employees with ${compareValue} ${overpaidGroupVsNextBest.groupName} are paid ${_.round(((overpaidGroupVsNextBest.averageSalary / secondHighestSalary) - 1) * 100)}% more than the next highest paid group`}
+        </Alert>
+      )}
+      {!_.isEmpty(underpaidGroupVsNextBest) && !hasDismissedUnderpaidAlert && (
+        <Alert variant="danger" dismissible onClose={() => setHasDismissedUnderpaidAlert(true)}>
+          {`Under the selected filters, employees with ${compareValue} ${underpaidGroupVsNextBest.groupName} are paid ${_.round((1 - (underpaidGroupVsNextBest.averageSalary / secondLowestSalary)) * 100)}% less than the next lowest paid group`}
+        </Alert>
+      )}
       {shouldShowAdditionalFilters && (
         <>
           <br />
@@ -191,7 +264,7 @@ const Body = () => {
                 <th>{val}</th>
               ))}
               <th># employees</th>
-              <th>Avg. salary</th>
+              <th>avg. salary</th>
             </tr>
           </thead>
           <tbody>
