@@ -1,15 +1,6 @@
 import Container from 'react-bootstrap/Container';
-import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import _ from 'lodash';
-import {
-  VictoryAxis,
-  VictoryBar,
-  VictoryChart,
-  VictoryContainer,
-  VictoryPie,
-  VictoryTheme,
-} from 'victory';
+import DataVizCharts from './DataVizCharts';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -30,42 +21,7 @@ function App() {
       <body className="App-body">
         <Container>
           <Row>
-            <Container>
-              <Row>
-                <Col>
-                  <VictoryChart
-                    height={200}
-                    width={300}
-                    domainPadding={50}
-                    theme={VictoryTheme.material}
-                    // containerComponent={<VictoryContainer responsive={false} />}
-                  >
-                    <VictoryAxis tickFormat={_.upperFirst} />
-                    <VictoryAxis
-                      dependentAxis
-                      tickFormat={(y) => `$${y / 1000}k`}
-                    />
-                    <VictoryBar
-                      data={exampleData}
-                      x="gender"
-                      y="averageSalary"
-                      barWidth={20}
-                    />
-                  </VictoryChart>
-                </Col>
-                <Col>
-                  <VictoryPie
-                    radius={100}
-                    data={exampleData}
-                    x="gender"
-                    y="averageSalary"
-                    colorScale={'cool'}
-                    // labels={({ x }) => _.upperFirst(x)}
-                    // containerComponent={<VictoryContainer responsive={false} />}
-                  />
-                </Col>
-              </Row>
-            </Container>
+            <DataVizCharts data={exampleData} />
           </Row>
         </Container>
       </body>
