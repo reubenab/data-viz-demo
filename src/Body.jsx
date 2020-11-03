@@ -136,7 +136,9 @@ const Body = () => {
             <Dropdown.Item eventKey={val}>{val}</Dropdown.Item>
           ))}
         </DropdownButton>
-        <Button style={{ marginLeft: 30 }} onClick={handleClickAdditionalFiltersLink}>{shouldShowAdditionalFilters ? 'Hide additional filters' : 'Show additional filters'}</Button>
+        <Button variant="secondary" style={{ marginLeft: 30 }} onClick={handleClickAdditionalFiltersLink}>
+          {shouldShowAdditionalFilters ? 'Hide additional filters' : 'Show additional filters'}
+        </Button>
       </Row>
       {shouldShowAdditionalFilters && (
         <>
