@@ -56,6 +56,13 @@ const COMPARE_KEYS = {
   JOB_CODE: 'job_code',
 };
 
+const READABLE_COMPARE_KEYS = {
+  [COMPARE_KEYS.GENDER]: 'Gender',
+  [COMPARE_KEYS.DEPARTMENT]: 'Department',
+  [COMPARE_KEYS.PERFORMANCE]: 'Performance',
+  [COMPARE_KEYS.JOB_CODE]: 'Job code',
+}
+
 const ADDITIONAL_FILTERS = {
   [COMPARE_KEYS.GENDER]: {
     ALL: 'All',
@@ -196,7 +203,7 @@ const Body = () => {
         <p style={{ marginRight: 20 }}>Compare across</p>
         <DropdownButton id="compare-across" title={_.upperFirst(compareValue)} onSelect={handleCompareButtonSelect}>
           {_.map(COMPARE_KEYS, (val) => (
-            <Dropdown.Item eventKey={val}>{val}</Dropdown.Item>
+            <Dropdown.Item eventKey={val}>{READABLE_COMPARE_KEYS[val]}</Dropdown.Item>
           ))}
         </DropdownButton>
         <Button variant="secondary" style={{ marginLeft: 30 }} onClick={handleClickAdditionalFiltersLink}>
@@ -261,10 +268,10 @@ const Body = () => {
           <thead>
             <tr>
               {_.map(COMPARE_KEYS, (val) => (
-                <th>{val}</th>
+                <th>{READABLE_COMPARE_KEYS[val]}</th>
               ))}
-              <th># employees</th>
-              <th>avg. salary</th>
+              <th># Employees</th>
+              <th>Avg. salary</th>
             </tr>
           </thead>
           <tbody>
