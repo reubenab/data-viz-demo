@@ -1,0 +1,52 @@
+[
+  {
+    "job_code": "R1",
+    "midpoint_cash": "50000",
+    "midpoint_equity_value": "5000"
+  },
+  {
+    "job_code": "R2",
+    "midpoint_cash": "60000",
+    "midpoint_equity_value": "12000"
+  },
+  {
+    "job_code": "R3",
+    "midpoint_cash": "72000",
+    "midpoint_equity_value": "28800"
+  },
+  {
+    "job_code": "R4",
+    "midpoint_cash": "86400",
+    "midpoint_equity_value": "51840"
+  },
+  {
+    "job_code": "R5",
+    "midpoint_cash": "103680",
+    "midpoint_equity_value": "82944"
+  },
+  {
+    "job_code": "R6",
+    "midpoint_cash": "124416",
+    "midpoint_equity_value": "149299.2"
+  },
+  {
+    "job_code": "R7",
+    "midpoint_cash": "149299.2",
+    "midpoint_equity_value": "209018.88"
+  },
+  {
+    "job_code": "R8",
+    "midpoint_cash": "179159.04",
+    "midpoint_equity_value": "286654.46"
+  },
+  {
+    "job_code": "R9",
+    "midpoint_cash": "214990.85",
+    "midpoint_equity_value": "386983.53"
+  },
+  {
+    "job_code": "R10",
+    "midpoint_cash": "257989.02",
+    "midpoint_equity_value": "515978.04"
+  }
+]

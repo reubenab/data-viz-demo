@@ -1,0 +1,23 @@
+{
+  "endpoints": [
+    {
+      "name": "/companies/:companyId/benchmarks",
+      "method": "GET"
+    },
+    {
+      "name": "/companies/:companyId/employees",
+      "method": "GET"
+    },
+    {
+      "name": "/companies/:companyId/employees/:eid",
+      "method": "GET"
+    },
+    {
+      "name": "/companies/:companyId/employees/:eid/comphistory/:type",
+      "method": "GET"
+    }
+  ],
+  "types": {
+    "comphistory": ["salary", "equity", "bonuses"]
+  }
+}
