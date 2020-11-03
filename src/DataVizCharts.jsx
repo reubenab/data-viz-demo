@@ -8,7 +8,7 @@ import {
   VictoryChart,
   VictoryPie,
   VictoryTheme,
-  VictoryTooltip
+  VictoryTooltip,
 } from 'victory';
 
 const DataVizCharts = ({ data, label }) => {
@@ -22,24 +22,25 @@ const DataVizCharts = ({ data, label }) => {
             domainPadding={50}
             theme={VictoryTheme.material}
           >
-            <VictoryAxis label={label} tickFormat={_.upperFirst} style={{
-              axisLabel: {
-                fontSize: 20,
-                padding: 40,
-              }
-            }} />
             <VictoryAxis
-              dependentAxis
-              tickFormat={(y) => `$${y / 1000}k`}
+              label={label}
+              tickFormat={_.upperFirst}
+              style={{
+                axisLabel: {
+                  fontSize: 20,
+                  padding: 40,
+                },
+              }}
             />
+            <VictoryAxis dependentAxis tickFormat={(y) => `$${y / 1000}k`} />
             <VictoryBar
               data={data}
               x="groupName"
               y="averageSalary"
               barWidth={20}
-              style={{ data: { fill: 'rgb(39 70 185)'}}}
+              style={{ data: { fill: 'rgb(39 70 185)' } }}
               labels={({ datum }) => `$${datum.averageSalary}`}
-              labelComponent={<VictoryTooltip dy={0} />} 
+              labelComponent={<VictoryTooltip dy={0} />}
             />
           </VictoryChart>
         </Col>
@@ -55,6 +56,6 @@ const DataVizCharts = ({ data, label }) => {
       </Row>
     </Container>
   );
-}
+};
 
 export default DataVizCharts;

@@ -22,7 +22,7 @@ const getEmployeesRaw = () => {
     data = lazyRequire.employees;
   }
   return data;
-}
+};
 
 const getSalaryRaw = () => {
   let data;
@@ -33,21 +33,25 @@ const getSalaryRaw = () => {
     data = lazyRequire.salary;
   }
   return data;
-}
+};
 
 const salaryForEmployeeThisYear = (eid) => {
   const salaryData = getSalaryRaw();
   // only consider salary data from 2020 and take the latest datapoint
-  const allSalaryThisYear = salaryData.filter(item => item.eid === eid && item.date.substring(6) === '2020');
+  const allSalaryThisYear = salaryData.filter(
+    (item) => item.eid === eid && item.date.substring(6) === '2020'
+  );
   const chronologicalSalary = _.sortBy(allSalaryThisYear, 'date');
   return _.last(chronologicalSalary);
-}
+};
 
 const getAverageSalary = (employeeData) => {
-  const allSalaries = _.map(employeeData, ({ eid }) => salaryForEmployeeThisYear(eid));
-  const totalSalary = _.sumBy(allSalaries, ({ salary}) => parseInt(salary));
+  const allSalaries = _.map(employeeData, ({ eid }) =>
+    salaryForEmployeeThisYear(eid)
+  );
+  const totalSalary = _.sumBy(allSalaries, ({ salary }) => parseInt(salary));
   return _.round(totalSalary / (_.size(employeeData) || 1));
-}
+};
 
 const COMPARE_KEYS = {
   GENDER: 'gender',
@@ -61,7 +65,7 @@ const READABLE_COMPARE_KEYS = {
   [COMPARE_KEYS.DEPARTMENT]: 'Department',
   [COMPARE_KEYS.PERFORMANCE]: 'Performance',
   [COMPARE_KEYS.JOB_CODE]: 'Job code',
-}
+};
 
 const ADDITIONAL_FILTERS = {
   [COMPARE_KEYS.GENDER]: {
@@ -96,7 +100,7 @@ const ADDITIONAL_FILTERS = {
     R9: 'R9',
     R10: 'R10',
   },
-}
+};
 
 const initialFilter = {
   [COMPARE_KEYS.GENDER]: ADDITIONAL_FILTERS[COMPARE_KEYS.GENDER].ALL,
@@ -107,71 +111,88 @@ const initialFilter = {
 
 const rawEmployeeData = getEmployeesRaw();
 
-const groupedDataByType = _.reduce(COMPARE_KEYS, (acc, compareKey) => ({
-  ...acc,
-  [compareKey]: _.groupBy(rawEmployeeData, compareKey),
-}), {});
+const groupedDataByType = _.reduce(
+  COMPARE_KEYS,
+  (acc, compareKey) => ({
+    ...acc,
+    [compareKey]: _.groupBy(rawEmployeeData, compareKey),
+  }),
+  {}
+);
 
 const ACCEPTABLE_DIFFERENCE = 0.2;
 
 // TODO: test
-const getSecondHighestSalaryFromGroups = groups => {
+const getSecondHighestSalaryFromGroups = (groups) => {
   let highestSalary = 0;
   let secondHighestSalary = 0;
   _.forEach(groups, ({ averageSalary }) => {
     if (highestSalary < averageSalary) {
       highestSalary = averageSalary;
     }
-  })
+  });
   _.forEach(groups, ({ averageSalary }) => {
     if (secondHighestSalary < averageSalary && averageSalary < highestSalary) {
       secondHighestSalary = averageSalary;
     }
-  })
+  });
   return secondHighestSalary;
-}
+};
 
 // TODO: test
-const getSecondLowestSalaryFromGroups = groups => {
+const getSecondLowestSalaryFromGroups = (groups) => {
   let lowestSalary = Number.MAX_VALUE;
   let secondLowestSalary = Number.MAX_VALUE;
   _.forEach(groups, ({ averageSalary }) => {
     if (lowestSalary > averageSalary) {
       lowestSalary = averageSalary;
     }
-  })
+  });
   _.forEach(groups, ({ averageSalary }) => {
     if (secondLowestSalary > averageSalary && averageSalary > lowestSalary) {
       secondLowestSalary = averageSalary;
     }
-  })
+  });
   return secondLowestSalary;
-}
+};
 
 const Body = () => {
   const [compareValue, setCompareValue] = useState(COMPARE_KEYS.GENDER);
-  const [shouldShowAdditionalFilters, setShouldShowAdditionalFilters] = useState(false);
+  const [
+    shouldShowAdditionalFilters,
+    setShouldShowAdditionalFilters,
+  ] = useState(false);
   const [additionalFilters, setAdditionalFilters] = useState(initialFilter);
-  const [hasDismissedOverpaidAlert, setHasDismissedOverpaidAlert] = useState(false);
-  const [hasDismissedUnderpaidAlert, setHasDismissedUnderpaidAlert] = useState(false);
+  const [hasDismissedOverpaidAlert, setHasDismissedOverpaidAlert] = useState(
+    false
+  );
+  const [hasDismissedUnderpaidAlert, setHasDismissedUnderpaidAlert] = useState(
+    false
+  );
   // data to power charts
   const groupedData = groupedDataByType[compareValue];
-  const unsortedData = useMemo(() => _.map(groupedData, (groupEmployeeData, groupName) => {
-    const filteredEmployeeData = _.filter(groupEmployeeData, (employee) => {
-      return _.every(additionalFilters, (filterValue, filterType) => {
-        if (filterValue === 'All') {
-          return true;
-        }
-        return employee[filterType] === filterValue;
-      })
-    });
-    return {
-      groupName,
-      averageSalary: getAverageSalary(filteredEmployeeData),
-      numEmployees: _.size(filteredEmployeeData),
-    };
-  }), [groupedData, additionalFilters]);
-  const data = useMemo(() => _.sortBy(unsortedData, 'groupName'), [unsortedData]);
+  const unsortedData = useMemo(
+    () =>
+      _.map(groupedData, (groupEmployeeData, groupName) => {
+        const filteredEmployeeData = _.filter(groupEmployeeData, (employee) => {
+          return _.every(additionalFilters, (filterValue, filterType) => {
+            if (filterValue === 'All') {
+              return true;
+            }
+            return employee[filterType] === filterValue;
+          });
+        });
+        return {
+          groupName,
+          averageSalary: getAverageSalary(filteredEmployeeData),
+          numEmployees: _.size(filteredEmployeeData),
+        };
+      }),
+    [groupedData, additionalFilters]
+  );
+  const data = useMemo(() => _.sortBy(unsortedData, 'groupName'), [
+    unsortedData,
+  ]);
 
   // data to power smart alerts
 
@@ -186,15 +207,26 @@ const Body = () => {
 
   const secondHighestSalary = getSecondHighestSalaryFromGroups(data);
   const secondLowestSalary = getSecondLowestSalaryFromGroups(data);
-  const overpaidGroupVsNextBest = _.find(data, ({ averageSalary }) => !!averageSalary && !!secondHighestSalary  && averageSalary > (secondHighestSalary * (1 + ACCEPTABLE_DIFFERENCE)));
-  const underpaidGroupVsNextBest = _.find(data, ({ averageSalary }) => !!averageSalary &&  !!secondLowestSalary && averageSalary < (secondLowestSalary * (1 - ACCEPTABLE_DIFFERENCE)));
+  const overpaidGroupVsNextBest = _.find(
+    data,
+    ({ averageSalary }) =>
+      !!averageSalary &&
+      !!secondHighestSalary &&
+      averageSalary > secondHighestSalary * (1 + ACCEPTABLE_DIFFERENCE)
+  );
+  const underpaidGroupVsNextBest = _.find(
+    data,
+    ({ averageSalary }) =>
+      !!averageSalary &&
+      !!secondLowestSalary &&
+      averageSalary < secondLowestSalary * (1 - ACCEPTABLE_DIFFERENCE)
+  );
   console.log('overpaidGroupVsNextBest', overpaidGroupVsNextBest);
-  
 
   const handleCompareButtonSelect = (eventKey) => {
     setCompareValue(eventKey);
     setAdditionalFilters(initialFilter);
-  }
+  };
   const handleClickAdditionalFiltersLink = (e) => {
     e.preventDefault();
     setShouldShowAdditionalFilters(!shouldShowAdditionalFilters);
@@ -203,23 +235,53 @@ const Body = () => {
     <Container>
       <Row className="align-items-center">
         <p style={{ marginRight: 20 }}>Compare across</p>
-        <DropdownButton id="compare-across" title={_.upperFirst(compareValue)} onSelect={handleCompareButtonSelect}>
+        <DropdownButton
+          id="compare-across"
+          title={_.upperFirst(compareValue)}
+          onSelect={handleCompareButtonSelect}
+        >
           {_.map(COMPARE_KEYS, (val) => (
-            <Dropdown.Item eventKey={val}>{READABLE_COMPARE_KEYS[val]}</Dropdown.Item>
+            <Dropdown.Item eventKey={val}>
+              {READABLE_COMPARE_KEYS[val]}
+            </Dropdown.Item>
           ))}
         </DropdownButton>
-        <Button variant="secondary" style={{ marginLeft: 30 }} onClick={handleClickAdditionalFiltersLink}>
-          {shouldShowAdditionalFilters ? 'Hide additional filters' : 'Show additional filters'}
+        <Button
+          variant="secondary"
+          style={{ marginLeft: 30 }}
+          onClick={handleClickAdditionalFiltersLink}
+        >
+          {shouldShowAdditionalFilters
+            ? 'Hide additional filters'
+            : 'Show additional filters'}
         </Button>
       </Row>
       {!_.isEmpty(overpaidGroupVsNextBest) && !hasDismissedOverpaidAlert && (
-        <Alert variant="danger" dismissible onClose={() => setHasDismissedOverpaidAlert(true)}>
-          {`Under the selected filters, employees with ${compareValue} ${overpaidGroupVsNextBest.groupName} are paid ${_.round(((overpaidGroupVsNextBest.averageSalary / secondHighestSalary) - 1) * 100)}% more than the next highest paid group`}
+        <Alert
+          variant="danger"
+          dismissible
+          onClose={() => setHasDismissedOverpaidAlert(true)}
+        >
+          {`Under the selected filters, employees with ${compareValue} ${
+            overpaidGroupVsNextBest.groupName
+          } are paid ${_.round(
+            (overpaidGroupVsNextBest.averageSalary / secondHighestSalary - 1) *
+              100
+          )}% more than the next highest paid group`}
         </Alert>
       )}
       {!_.isEmpty(underpaidGroupVsNextBest) && !hasDismissedUnderpaidAlert && (
-        <Alert variant="danger" dismissible onClose={() => setHasDismissedUnderpaidAlert(true)}>
-          {`Under the selected filters, employees with ${compareValue} ${underpaidGroupVsNextBest.groupName} are paid ${_.round((1 - (underpaidGroupVsNextBest.averageSalary / secondLowestSalary)) * 100)}% less than the next lowest paid group`}
+        <Alert
+          variant="danger"
+          dismissible
+          onClose={() => setHasDismissedUnderpaidAlert(true)}
+        >
+          {`Under the selected filters, employees with ${compareValue} ${
+            underpaidGroupVsNextBest.groupName
+          } are paid ${_.round(
+            (1 - underpaidGroupVsNextBest.averageSalary / secondLowestSalary) *
+              100
+          )}% less than the next lowest paid group`}
         </Alert>
       )}
       {shouldShowAdditionalFilters && (
@@ -248,7 +310,10 @@ const Body = () => {
                         variant="secondary"
                         name="radio"
                         value={subgroupName}
-                        checked={additionalFilters[groupName] === ADDITIONAL_FILTERS[groupName][subgroupKey]}
+                        checked={
+                          additionalFilters[groupName] ===
+                          ADDITIONAL_FILTERS[groupName][subgroupKey]
+                        }
                         onChange={handleChangeFilterRadio}
                       >
                         {subgroupName}
@@ -260,8 +325,7 @@ const Body = () => {
             );
           })}
         </>
-      )
-    }
+      )}
       <Row>
         <DataVizCharts data={data} label={_.upperFirst(compareValue)} />
       </Row>
@@ -280,7 +344,9 @@ const Body = () => {
             {_.map(data, ({ groupName, averageSalary, numEmployees }) => (
               <tr>
                 {_.map(COMPARE_KEYS, (val) => (
-                  <td>{compareValue === val ? groupName : additionalFilters[val]}</td>
+                  <td>
+                    {compareValue === val ? groupName : additionalFilters[val]}
+                  </td>
                 ))}
                 <td>{numEmployees}</td>
                 <td>{`$${averageSalary}`}</td>
